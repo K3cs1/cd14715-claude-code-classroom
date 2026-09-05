@@ -7,11 +7,17 @@
  * This exercise reinforces how to pick the right model for different tasks.
  */
 
-import Anthropic from "@anthropic-ai/sdk";
-import { MODELS, ModelKey } from "./models.js";
-import { calculateCost, logStats, displayComparison, ensureParsedResponse } from "./helpers.js";
-import { Message, Model } from "@anthropic-ai/sdk/resources";
-import dotenv from "dotenv";
+import Anthropic from '@anthropic-ai/sdk';
+import { MODELS, ModelKey } from './models.js';
+import {
+  calculateCost,
+  logStats,
+  displayComparison,
+  ensureParsedResponse,
+} from './helpers.js';
+import { Message, Model } from '@anthropic-ai/sdk/resources';
+import dotenv from 'dotenv';
+import { TICKETS } from './sample-tickets.js';
 dotenv.config();
 
 /**Initialize the Anthropic client */
@@ -19,12 +25,15 @@ const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-
 // -----------------------------------------------------------------------------
 // Helper: Call Claude and return the response with usage stats
 // -----------------------------------------------------------------------------
 
-async function callClaude(modelKey: ModelKey, system: string, userMessage: string) {
+async function callClaude(
+  modelKey: ModelKey,
+  system: string,
+  userMessage: string,
+) {
   const model = MODELS[modelKey];
   const start = Date.now();
 
@@ -38,8 +47,7 @@ async function callClaude(modelKey: ModelKey, system: string, userMessage: strin
 
   const cost = calculateCost(inputTokens, outputTokens, model);
 
-
-  const text = "";
+  const text = '';
 
   return { text, inputTokens, outputTokens, ms, cost };
 }
@@ -53,10 +61,10 @@ async function testHaiku() {
 
   // TODO: Define system prompt
   // Goal: Classify support ticket priority as: LOW, MEDIUM, HIGH, or URGENT
-  const system = `YOUR SYSTEM PROMPT HERE`;
+  const system = `Classify support ticket priority as: LOW, MEDIUM, HIGH, or URGENT. Respond with only the level.`;
 
   // TODO: Call Claude with Haiku model
-  const result = null; // Replace with API call
+  const result = await callClaude('haiku', system, TICKETS.simple);
 
   // TODO: Display results
   console.log(`Result: ${result.text}`);
@@ -70,7 +78,7 @@ async function testHaiku() {
 // -----------------------------------------------------------------------------
 
 async function testSonnet() {
-  console.log("\n---  Sonnet for Detailed Analysis ---\n");
+  console.log('\n---  Sonnet for Detailed Analysis ---\n');
 
   // TODO: Define system prompt
   // Goal: Analyze the support ticket and extract:
@@ -79,11 +87,17 @@ async function testSonnet() {
   //   3. Key details
   //   4. Recommended action
   // Keep response concise
-  const system = `YOUR SYSTEM PROMPT HERE`;
+  const system = `Analyze the support ticket. Extract:
+                  1. Priority level
+                  2. Issue category
+                  3. Key details
+                  4. Recommended action
+
+                  Be concise.`;
 
   // TODO: Call Claude with Sonnet model
   // Use: callClaude("sonnet", system, TICKETS.moderate)
-  const result = null; // Replace with API call
+  const result = await callClaude('sonnet', system, TICKETS.moderate);
 
   // TODO: Display results
   console.log(`Result:\n${result.text}`);
@@ -97,7 +111,7 @@ async function testSonnet() {
 // -----------------------------------------------------------------------------
 
 async function testOpus() {
-  console.log("\n---  Opus for Complex Reasoning ---\n");
+  console.log('\n---  Opus for Complex Reasoning ---\n');
 
   // TODO: Define system prompt
   // Goal: Act as a senior support manager and provide:
@@ -106,11 +120,17 @@ async function testOpus() {
   //   3. Impact assessment (business, technical)
   //   4. Prioritized action plan
   // Encourage thorough thinking
-  const system = `YOUR SYSTEM PROMPT HERE`;
+  const system = `You are a senior support manager. Provide:
+                  1. Issue summary
+                  2. Root cause hypothesis for each issue
+                  3. Impact assessment (business, technical)
+                  4. Prioritized action plan
+
+                  Think through each element carefully.`;
 
   // TODO: Call Claude with Opus model
   // Use: callClaude("opus", system, TICKETS.complex)
-  const result = null; // Replace with API call
+  const result = await callClaude('opus', system, TICKETS.complex);
 
   // TODO: Display results
   console.log(`Result:\n${result.text}`);
@@ -124,7 +144,7 @@ async function testOpus() {
 // -----------------------------------------------------------------------------
 
 async function testCompare() {
-  console.log("\n---  Model Comparison ---\n");
+  console.log('\n---  Model Comparison ---\n');
 
   // TODO: Define system prompt for comparison
   // Goal: Analyze ticket and provide:
@@ -143,7 +163,7 @@ async function testCompare() {
   displayComparison(results);
   // Note: displayComparison() function handles the table formatting
 
-  console.log("\n💡 Pick the right model for the job!");
+  console.log('\n💡 Pick the right model for the job!');
 }
 
 // -----------------------------------------------------------------------------
@@ -151,16 +171,16 @@ async function testCompare() {
 // -----------------------------------------------------------------------------
 
 async function main() {
-  console.log("=".repeat(60));
-  console.log("  EXERCISE: Claude Model Selection");
-  console.log("  Scenario: Customer Support Ticket System");
-  console.log("=".repeat(60));
+  console.log('='.repeat(60));
+  console.log('  EXERCISE: Claude Model Selection');
+  console.log('  Scenario: Customer Support Ticket System');
+  console.log('='.repeat(60));
 
   // TODO: Uncomment each step as you complete it
-  // await testHaiku();
-  // await testSonnet();
-  // await testOpus();
-  // await testCompare();
+  await testHaiku();
+  await testSonnet();
+  await testOpus();
+  await testCompare();
 }
 
 main().catch(console.error);
